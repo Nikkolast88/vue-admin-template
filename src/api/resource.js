@@ -15,6 +15,14 @@ export function getResourcesRoots(params) {
   })
 }
 
+export function getUserRoleTree(params) {
+  return request({
+    url: `admin/resources/user`,
+    method: 'get',
+    params: params
+  })
+}
+
 export function postResources(params) {
   return request({
     url: `/admin/resources/create`,

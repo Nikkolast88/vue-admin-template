@@ -3,7 +3,7 @@ import store from './store'
 import NProgress from 'nprogress'
 import { getToken } from '@/utils/auth' // get token from cookie
 import getPageTitle from '@/utils/get-page-title'
-import { generateIndexRouter } from "@/utils"
+// import { generateIndexRouter } from "@/utils"
 NProgress.configure({ showSpinner: false })
 
 const whiteList = ['login', 'register'] // no redirect whitelist
@@ -23,12 +23,9 @@ router.beforeEach(async(to, from, next) => {
                 next()
             } else {
                 try {
-                    const resources = await store.dispatch('user/setResources')
-                    let constRoutes = [];
-                    constRoutes = generateIndexRouter(resources);
-                    console.log(constRoutes)
-                    // const accessRoutes = await store.dispatch('permission/generateRoutes', resources)
-                    router.addRoutes(constRoutes)
+                    const constRoutes = await store.dispatch('user/setResources')
+                    const accessRoutes = await store.dispatch('permission/generateRoutes', constRoutes)
+                    router.addRoutes(accessRoutes)
                     next({ ...to, replace: true })
                 } catch (error) {
                     console.log(error)

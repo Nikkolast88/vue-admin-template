@@ -1,5 +1,5 @@
-import { asyncRouterMap, constantRouterMap } from '@/config/router.config'
-
+import { constantRouterMap } from '@/config/router.config'
+import { getUserRoleTree } from '@/api/resource'
 /**
  * 过滤账户是否拥有某一个权限，并将菜单从加载列表移除
  *
@@ -7,16 +7,10 @@ import { asyncRouterMap, constantRouterMap } from '@/config/router.config'
  * @param route
  * @returns {boolean}
  */
-function hasPermission(permission, route) {
-    if (route.meta && route.meta.permission) {
-      let flag = -1
-      for (let i = 0, len = permission.length; i < len; i++) {
-        flag = route.meta.permission.indexOf(permission[i])
-        if (flag >= 0) {
-          return true
-        }
-      }
-      return false
+function hasPermission(resources, route) {
+    if (route.meta && route.meta.code) {
+      const flag = resources.some(resource => { return route.meta.code === resource.code })
+      return flag
     }
     return true
   }
@@ -39,7 +33,7 @@ function hasPermission(permission, route) {
   
   function filterAsyncRouter(routerMap, roles) {
     const accessedRouters = routerMap.filter(route => {
-      if (hasPermission(roles.permissionList, route)) {
+      if (hasPermission(roles, route)) {
         if (route.children && route.children.length) {
           route.children = filterAsyncRouter(route.children, roles)
         }
@@ -52,30 +46,44 @@ function hasPermission(permission, route) {
 
 
 const state = {
-    routes: constantRouterMap,
-    addRoutes: []
+    routers: constantRouterMap,
+    addRouters: []
 }
 
 const mutations = {
     SET_ROUTERS: (state, data) => {
         state.addRouters = data
         state.routers = constantRouterMap.concat(data)
-        console.log('-----mutations---SET_ROUTERS----', data)
       }
 }
 
 const actions = {
-    generateRoutes({ commit }, data) {
-        return new Promise(resolve => {
-          const { roles } = data
-          console.log('-----mutations---data----', data)
-          let accessedRouters
-          accessedRouters = filterAsyncRouter(asyncRouterMap, roles)
-          console.log('-----mutations---accessedRouters----', accessedRouters)
-          commit('SET_ROUTERS', accessedRouters)
-          resolve()
+    generateRoutes({ commit }, asyncRouterMap) {
+        // return new Promise((resolve, reject) => {
+        //   const { roles } = data
+        //   console.log('-----mutations---data----', data)
+        //   let accessedRouters
+        //   accessedRouters = filterAsyncRouter(asyncRouterMap, roles)
+        //   console.log('-----mutations---accessedRouters----', accessedRouters)
+        //   commit('SET_ROUTERS', accessedRouters)
+        //   resolve()
+        // })
+        return new Promise((resolve, reject) => {
+          getUserRoleTree()
+            .then((resp) => {
+              if (resp.code === 200) {
+                const { data } = resp
+                let accessedRouters
+                accessedRouters = filterAsyncRouter(asyncRouterMap, data)
+                commit('SET_ROUTERS', accessedRouters)
+                resolve(accessedRouters)
+              }
+            })
+            .catch((error) => {
+              reject(error)
+            })
         })
-      },
+      }
 }
 
 export default {

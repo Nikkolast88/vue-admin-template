@@ -1,4 +1,5 @@
 import { getResources } from '@/api/resource'
+import { generateIndexRouter } from '@/utils'
 const state = {
   token: '',
   resources: []
@@ -29,8 +30,9 @@ const actions = {
         .then((resp) => {
           if (resp.code === 200) {
             const { data } = resp
+            const resources = generateIndexRouter(data)
             commit('SET_RESOURCES', data)
-            resolve(data)
+            resolve(resources)
           }
         })
         .catch((error) => {

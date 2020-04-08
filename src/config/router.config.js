@@ -1,4 +1,4 @@
-import { UserLayout } from '@/components/Layouts'
+import { UserLayout, BasicLayout } from '@/components/Layouts'
 
 /**
  * 走菜单，走权限控制
@@ -9,6 +9,7 @@ export const asyncRouterMap = [
     path: '/',
     name: 'dashboard',
     meta: { title: '首页' },
+    component: BasicLayout,
     redirect: '/dashboard/workplace',
     children: []
   },

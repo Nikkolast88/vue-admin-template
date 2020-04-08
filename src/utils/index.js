@@ -1,4 +1,5 @@
 import { isURL } from '@/utils/validate'
+import { BasicLayout } from '@/components/Layouts'
 export function timeFix() {
     const time = new Date()
     const hour = time.getHours()
@@ -9,7 +10,7 @@ export function generateIndexRouter(data) {
   let indexRouter = [{
             path: '/',
             name: 'dashboard',
-            //component: () => import('@/components/layouts/BasicLayout'),
+            component: BasicLayout,
             // component: resolve => require(['@/components/layouts/BasicLayout'], resolve),
             meta: { title: '首页' },
             redirect: '/dashboard/analysis',
@@ -39,14 +40,13 @@ export function generateIndexRouter(data) {
       if (isURL(URL)) {
         item.url = URL;
       }
-  
       let menu =  {
         path: item.path,
         name: item.name,
         redirect:item.redirect,
-        component: resolve => require(['@/' + component+'.vue'], resolve),
+        // component: (resolve) => require(['@/components/Layouts/RouteView.vue'], resolve),
         hidden:item.hidden,
-        // component:()=> import(`@/views/${component}.vue`),
+        component:()=> import(`@/${component}.vue`),
         meta: {
           title:item.title ,
           icon: item.icon,
